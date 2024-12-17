@@ -12,6 +12,7 @@ const db = new Client({
 async function insertData(data) {
     try {
         await db.connect();
+        console.log('Datos a insertar:', data);
 
         // Insertar en fixtures
         const fixtureResult = await db.query(

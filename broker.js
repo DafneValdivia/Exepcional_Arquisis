@@ -20,7 +20,12 @@ async function startApplication() {
     client.on('connect', () => {
         console.log('Conectado al broker MQTT');
         client.subscribe(process.env.MQTT_CHANNEL, (err) => {
-            if (err) console.error('Error al suscribirse:', err);
+            if (err) {
+                console.error('Error al suscribirse:', err);
+            }
+            else {
+                console.log(`Suscrito al canal: ${process.env.MQTT_CHANNEL}`);
+            }
         });
     });
 
