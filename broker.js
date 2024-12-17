@@ -11,32 +11,56 @@ const client = mqtt.connect({
     password: process.env.BROKER_PASSWORD,
 });
 
+async function connectAndSubscribe() {
+    return new Promise((resolve, reject) => {
+        client.on('connect', () => {
+            console.log('Conectado al broker MQTT');
+            client.subscribe("fixtures/info", (err) => {
+                if (err) {
+                    reject(`Error al suscribirse: ${err}`);
+                } else {
+                    console.log(`Suscrito al canal: ${process.env.MQTT_CHANNEL}`);
+                    //resolve();   La conexión y la suscripción fueron exitosas
+                }
+            });
+        });
 
-async function startApplication() {
-    // Crear/verificar las tablas
-    await createTables();
+        console.log("Cliente conectado:", client);
 
-    // Suscripción al canal MQTT
-    client.on('connect', () => {
-        console.log('Conectado al broker MQTT');
-        client.subscribe(process.env.MQTT_CHANNEL, (err) => {
-            if (err) {
-                console.error('Error al suscribirse:', err);
-            }
-            else {
-                console.log(`Suscrito al canal: ${process.env.MQTT_CHANNEL}`);
-            }
+        client.on('error', (err) => {
+            reject(`Error al conectar con el broker MQTT: ${err}`);
         });
     });
+}
 
-    // Manejar los mensajes recibidos
-    client.on('message', async (topic, message) => {
-        const data = JSON.parse(message.toString());
-        console.log('Mensaje recibido:', data);
+async function startApplication() {
+    try {
+        // Crear/verificar las tablas
+        await createTables();
 
-        // Insertar los datos en la base de datos
-        await insertData(data);
-    });
+        // Esperar a que la conexión y suscripción MQTT se completen
+        await connectAndSubscribe();
+
+        // Manejar los mensajes recibidos
+        client.on('message', async (topic, message) => {
+            console.log(`Mensaje recibido en el canal ${topic}:`);
+            try {
+                const data = JSON.parse(message.toString());
+                console.log('Contenido del mensaje:', data);
+        
+                // Aquí puedes insertar los datos en la base de datos
+            } catch (error) {
+                console.error('Error al procesar el mensaje:', error);
+            }
+        });
+
+        console.log("Aplicación en ejecución, esperando mensajes...");
+
+    } catch (error) {
+        console.error('Error en la aplicación:', error);
+    }
+
+    console.log("salio");
 }
 
 startApplication();

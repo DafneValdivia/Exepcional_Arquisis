@@ -82,9 +82,6 @@ async function createTables() {
     } catch (err) {
         console.error('Error al crear las tablas:', err);
         throw err;
-    } finally {
-        await db.end();
-        console.log('Conexión a la base de datos cerrada');
     }
 }
 
