@@ -1,0 +1,13 @@
+{
+    "name": "mqtt-listener",
+    "version": "1.0.0",
+    "main": "broker.js",
+    "scripts": {
+        "start": "node broker.js"
+    },
+    "dependencies": {
+        "dotenv": "^16.4.7",
+        "mqtt": "^4.3.7",
+        "pg": "^8.10.0"
+    }
+}
